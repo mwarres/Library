@@ -1,3 +1,9 @@
+let IDCount = 0; // Note: using this to generate IDs in an adhoc way
+
+function generateID() {
+  return IDCount++;
+}
+
 let myLibrary = [
     new Book("Pride and Prejudice", "Austen", 432, true),
     new Book("Lord of the Rings", "Tolkein", "too many", false)
@@ -8,10 +14,22 @@ function Book(title, author, pages, read) {
     this.author = author;
     this.pages = pages;
     this.read = read;
-    this.info = function() {
-        const readMessage = this.read ? "already read" : "not read yet";
-        return `${this.title} by ${this.author}, ${this.pages} pages, ${readMessage}`;
+    this.id = generateID();
+}
+
+Book.prototype.removeBook = function(e) {
+    let bookIndex;
+    for (let i = 0; i < myLibrary.length; i++) {
+        if (myLibrary[i].id === parseInt(e.target.id)) {
+            bookIndex = i;
+        }
     }
+    myLibrary.splice(bookIndex, 1);
+    const bookShelf = document.querySelector(".book-shelf");
+    while (bookShelf.firstChild) {
+        bookShelf.removeChild(bookShelf.firstChild);
+    }
+    displayBooks();
 }
 
 function addBookToLibrary(title, author, pages, read) {
@@ -36,6 +54,11 @@ function displayBooks() {
         const read = document.createElement("p");
         read.textContent = book.read ? `Read \u2705` : "Unread \uD83D\uDC4E";
         bookCard.appendChild(read);
+        const removeButton = document.createElement("button");
+        removeButton.textContent = "REMOVE BOOK";
+        removeButton.id = book.id;
+        removeButton.addEventListener("click", Book.prototype.removeBook);
+        bookCard.appendChild(removeButton);
         bookShelf.appendChild(bookCard);
     }
 }
@@ -116,5 +139,5 @@ function createInputs(inputFields, inputTypes, form) {
 
 
 displayBooks();
-const button = document.querySelector("button");
+const button = document.querySelector("#new-book");
 button.addEventListener("click", displayAddBookForm);
